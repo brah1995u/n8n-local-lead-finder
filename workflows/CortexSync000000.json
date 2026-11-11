@@ -1,0 +1,145 @@
+{
+  "id": "CortexSync000000",
+  "name": "Cortex · Airtable",
+  "active": false,
+  "nodes": [
+    {
+      "id": "Manual",
+      "name": "Перевірити вручну",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        280,
+        400
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "Schedule",
+      "name": "Розклад",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        280,
+        240
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "Preview",
+      "name": "Без зовнішніх дій",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        420,
+        400
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dry",
+              "name": "dry_run",
+              "value": true,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "Airtable",
+      "name": "Airtable",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        240
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://worker:8000/internal/tick/sync",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 240000
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "dry_run",
+              "value": "={{ $json.dry_run === true }}"
+            }
+          ]
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "cortexInternalAuth",
+          "name": "Cortex Internal API"
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "onError": "stopWorkflow"
+    }
+  ],
+  "connections": {
+    "Розклад": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Перевірити вручну": {
+      "main": [
+        [
+          {
+            "node": "Без зовнішніх дій",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Без зовнішніх дій": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Madrid",
+    "executionTimeout": 300,
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": true,
+    "errorWorkflow": "CortexErrorFlow01"
+  },
+  "pinData": {},
+  "tags": []
+}

@@ -1,0 +1,12 @@
+{
+  "airtable_base": "YOUR_AIRTABLE_BASE_ID",
+  "airtable_table": "YOUR_AIRTABLE_TABLE_ID",
+  "record_limit": 800,
+  "airtable_monthly_calls": 600,
+  "apify_monthly_budget_usd": 4.5,
+  "apify_reserve_usd": 0.5,
+  "apify_run_cap_usd": 0.5,
+  "maps_actor": "compass~crawler-google-places",
+  "search_actor": "apify~google-search-scraper",
+  "legacy_sources": []
+}

@@ -1,0 +1,23 @@
+[
+  {"id":"gandia","name":"Gandia + Grau + Platja","query":"Gandia, Safor, Valencia, España","aliases":["Grau i Platja","Grao de Gandia","Grau de Gandia"],"zones":[{"name":"Gandia municipi","bbox":[-0.31,38.93,-0.14,39.06],"location_query":true},{"name":"Gandia centre","bbox":[-0.216,38.948,-0.159,38.990]},{"name":"Grau i port","bbox":[-0.174,38.982,-0.143,39.009],"coastal":true},{"name":"Platja de Gandia","bbox":[-0.191,39.001,-0.146,39.045],"coastal":true}]},
+  {"id":"daimus","name":"Daimús","query":"Daimús, Safor, Valencia, España"},
+  {"id":"guardamar","name":"Guardamar de la Safor","query":"Guardamar de la Safor, Valencia, España"},
+  {"id":"bellreguard","name":"Bellreguard","query":"Bellreguard, Safor, Valencia, España"},
+  {"id":"miramar","name":"Miramar","query":"Miramar, Safor, Valencia, España"},
+  {"id":"piles","name":"Piles","query":"Piles, Safor, Valencia, España"},
+  {"id":"oliva","name":"Oliva","query":"Oliva, Safor, Valencia, España"},
+  {"id":"denia","name":"Dénia","query":"Dénia, Alicante, España"},
+  {"id":"javea","name":"Xàbia / Jávea","query":"Xàbia, Alicante, España"},
+  {"id":"calp","name":"Calp","query":"Calp, Alicante, España"},
+  {"id":"altea","name":"Altea","query":"Altea, Alicante, España"},
+  {"id":"benidorm","name":"Benidorm","query":"Benidorm, Alicante, España"},
+  {"id":"villajoyosa","name":"La Vila Joiosa","query":"La Vila Joiosa, Alicante, España","aliases":["Villajoyosa","Vila Joiosa"]},
+  {"id":"el-campello","name":"El Campello","query":"El Campello, Alicante, España"},
+  {"id":"alicante","name":"Alicante","query":"Alicante, España","aliases":["Alacant"]},
+  {"id":"xeraco","name":"Xeraco","query":"Xeraco, Safor, Valencia, España"},
+  {"id":"tavernes","name":"Tavernes de la Valldigna","query":"Tavernes de la Valldigna, Valencia, España"},
+  {"id":"cullera","name":"Cullera","query":"Cullera, Valencia, España"},
+  {"id":"sueca","name":"Sueca","query":"Sueca, Valencia, España"},
+  {"id":"el-perello","name":"El Perelló","query":"El Perelló, Sueca, Valencia, España"},
+  {"id":"valencia","name":"València","query":"València, España"}
+]

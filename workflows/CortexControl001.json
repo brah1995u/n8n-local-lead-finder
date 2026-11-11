@@ -1,0 +1,179 @@
+{
+  "id": "CortexControl001",
+  "name": "Cortex · Керування",
+  "active": false,
+  "nodes": [
+    {
+      "id": "City Form",
+      "name": "Обрати місто",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        280,
+        240
+      ],
+      "parameters": {
+        "formTitle": "Cortex Leads — вибір міста",
+        "formDescription": "Прогрес і підключення: http://localhost:5680/",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Місто",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Gandia + Grau + Platja"
+                  },
+                  {
+                    "option": "Daimús"
+                  },
+                  {
+                    "option": "Guardamar de la Safor"
+                  },
+                  {
+                    "option": "Bellreguard"
+                  },
+                  {
+                    "option": "Miramar"
+                  },
+                  {
+                    "option": "Piles"
+                  },
+                  {
+                    "option": "Oliva"
+                  },
+                  {
+                    "option": "Dénia"
+                  },
+                  {
+                    "option": "Xàbia / Jávea"
+                  },
+                  {
+                    "option": "Calp"
+                  },
+                  {
+                    "option": "Altea"
+                  },
+                  {
+                    "option": "Benidorm"
+                  },
+                  {
+                    "option": "La Vila Joiosa"
+                  },
+                  {
+                    "option": "El Campello"
+                  },
+                  {
+                    "option": "Alicante"
+                  },
+                  {
+                    "option": "Xeraco"
+                  },
+                  {
+                    "option": "Tavernes de la Valldigna"
+                  },
+                  {
+                    "option": "Cullera"
+                  },
+                  {
+                    "option": "Sueca"
+                  },
+                  {
+                    "option": "El Perelló"
+                  },
+                  {
+                    "option": "València"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Дія",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Запустити"
+                  },
+                  {
+                    "option": "Продовжити"
+                  },
+                  {
+                    "option": "Повторно перевірити"
+                  }
+                ]
+              },
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "path": "cortex-city",
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "Місто додано в чергу. Прогрес: http://localhost:5680/"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "Додати місто",
+      "name": "Додати місто",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        240
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://worker:8000/internal/jobs",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 240000
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({city_id: {\"Gandia + Grau + Platja\": \"gandia\", \"Daimús\": \"daimus\", \"Guardamar de la Safor\": \"guardamar\", \"Bellreguard\": \"bellreguard\", \"Miramar\": \"miramar\", \"Piles\": \"piles\", \"Oliva\": \"oliva\", \"Dénia\": \"denia\", \"Xàbia / Jávea\": \"javea\", \"Calp\": \"calp\", \"Altea\": \"altea\", \"Benidorm\": \"benidorm\", \"La Vila Joiosa\": \"villajoyosa\", \"El Campello\": \"el-campello\", \"Alicante\": \"alicante\", \"Xeraco\": \"xeraco\", \"Tavernes de la Valldigna\": \"tavernes\", \"Cullera\": \"cullera\", \"Sueca\": \"sueca\", \"El Perelló\": \"el-perello\", \"València\": \"valencia\"}[$json[\"Місто\"]], mode: {\"Запустити\":\"start\",\"Продовжити\":\"continue\",\"Повторно перевірити\":\"recheck\"}[$json[\"Дія\"]], pilot:true}) }}"
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "cortexInternalAuth",
+          "name": "Cortex Internal API"
+        }
+      },
+      "retryOnFail": false,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "onError": "stopWorkflow"
+    }
+  ],
+  "connections": {
+    "Обрати місто": {
+      "main": [
+        [
+          {
+            "node": "Додати місто",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Madrid",
+    "executionTimeout": 300,
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": true,
+    "errorWorkflow": "CortexErrorFlow01"
+  },
+  "pinData": {},
+  "tags": []
+}

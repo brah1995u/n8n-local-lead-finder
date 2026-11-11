@@ -1,0 +1,70 @@
+{
+  "id": "CortexErrorFlow01",
+  "name": "Cortex · Помилки",
+  "active": false,
+  "nodes": [
+    {
+      "id": "Error Trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        280,
+        240
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "Записати помилку",
+      "name": "Записати помилку",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        240
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "http://worker:8000/internal/errors",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 240000
+        }
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "cortexInternalAuth",
+          "name": "Cortex Internal API"
+        }
+      },
+      "retryOnFail": false,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "onError": "stopWorkflow"
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Записати помилку",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Europe/Madrid",
+    "executionTimeout": 300,
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "all",
+    "saveManualExecutions": true
+  },
+  "pinData": {},
+  "tags": []
+}

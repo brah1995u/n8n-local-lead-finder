@@ -1,0 +1,109 @@
+name: cortex-leads
+services:
+  postgres:
+    image: postgres:17.10-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cortex
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/bootstrap.py first}
+      POSTGRES_DB: cortex
+    volumes:
+      - postgres_data_v17:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/01-n8n.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cortex -d cortex"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  worker:
+    build: .
+    image: cortex-leads-worker:1.0.0
+    restart: unless-stopped
+    init: true
+    shm_size: 512mb
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      INTERNAL_TOKEN: ${INTERNAL_TOKEN}
+      RESTORE_MODE: ${RESTORE_MODE:-false}
+      TZ: Europe/Madrid
+    ports: ["127.0.0.1:${CONTROL_PORT:-5680}:8000"]
+    networks:
+      - default
+      - main_n8n
+    volumes:
+      - ./.secrets:/state
+      - ./config:/app/config:ro
+      - ./app:/app/app:ro
+      - ./runtime:/runtime
+    depends_on:
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+  n8n:
+    # Retained only for recovery of the former 5679 instance. Never started by default.
+    profiles: ["legacy-n8n"]
+    image: docker.n8n.io/n8nio/n8n:2.44.7
+    restart: unless-stopped
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: postgres
+      DB_POSTGRESDB_DATABASE: n8n
+      DB_POSTGRESDB_USER: cortex
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD}
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+      N8N_HOST: localhost
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      N8N_EDITOR_BASE_URL: http://localhost:${N8N_PORT:-5679}/
+      WEBHOOK_URL: http://localhost:${N8N_PORT:-5679}/
+      N8N_SECURE_COOKIE: "false"
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      N8N_PERSONALIZATION_ENABLED: "false"
+      N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "true"
+      EXECUTIONS_DATA_PRUNE: "true"
+      EXECUTIONS_DATA_MAX_AGE: 168
+      EXECUTIONS_DATA_SAVE_ON_SUCCESS: none
+      GENERIC_TIMEZONE: Europe/Madrid
+      TZ: Europe/Madrid
+    ports: ["127.0.0.1:${N8N_PORT:-5679}:5678"]
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./workflows:/imports:ro
+      - ./.secrets/n8n-import:/credential-import:ro
+    depends_on:
+      postgres: {condition: service_healthy}
+  backup:
+    build: ./backup
+    image: cortex-leads-backup:1.0.0
+    restart: unless-stopped
+    environment:
+      PGHOST: postgres
+      PGUSER: cortex
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      ALLOW_MAIN_N8N_DRIVE_UPLOAD: ${ALLOW_MAIN_N8N_DRIVE_UPLOAD:-false}
+      TZ: Europe/Madrid
+    volumes:
+      - n8n_data:/snapshot/n8n:ro
+      - main_n8n_data:/snapshot/main-n8n:ro
+      - ${MAIN_N8N_PROJECT_DIR:-../n8n-reels}:/snapshot/main-project:ro
+      - ./.secrets:/snapshot/secrets:ro
+      - ./.env:/snapshot/deployment.env:ro
+      - ./backups:/backups
+      - ./runtime:/runtime
+      - ./.secrets/rclone:/config/rclone
+    depends_on:
+      postgres: {condition: service_healthy}
+volumes:
+  postgres_data_v17:
+  n8n_data:
+  main_n8n_data:
+    external: true
+    name: n8n-reels_n8n_data
+networks:
+  main_n8n:
+    external: true
+    name: n8n-reels_default
